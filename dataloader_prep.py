@@ -97,10 +97,10 @@ def prepare_dataloader(file_path, max_words=20000, max_len=100, batch_size=32, t
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-    return train_loader, test_loader
+    return train_loader, test_loader, train_dataset, test_dataset
 
 # Example usage
 if __name__ == "__main__":
-    train_loader, test_loader = prepare_dataloader("cleaned_cyberbullying_dataset.csv")
+    train_loader, test_loader, train_dataset, test_dataset = prepare_dataloader("cleaned_cyberbullying_dataset.csv")
     print("Dataloader is ready!")
 
