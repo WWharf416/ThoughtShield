@@ -60,8 +60,12 @@ def main():
             4: 'age', 
             5: 'ethnicity'
         }
+
         print("\nText:", text)
-        print("Predicted class:", class_map[predicted_class])
+        if predicted_class == 0:
+            print("Not Cyberbullying")  
+        else:
+            print(f"Cyberbullying Detected.\nProbable Category: {class_map[predicted_class]}")
         print("Class probabilities:", probabilities)
 
 if __name__ == "__main__":

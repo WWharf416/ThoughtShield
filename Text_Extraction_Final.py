@@ -95,22 +95,24 @@ class TextExtractor:
                 return "No text detected"
             
             # Visualization
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            plt.figure(figsize=(10, 10))
-            plt.imshow(img)
+            # Uncomment to see the image with detected text
             
-            for detection in results:
-                box = detection[0]
-                text = detection[1]
-                top_left = tuple(map(int, box[0]))
-                bottom_right = tuple(map(int, box[2]))
-                plt.plot([top_left[0], bottom_right[0], bottom_right[0], top_left[0], top_left[0]],
-                         [top_left[1], top_left[1], bottom_right[1], bottom_right[1], top_left[1]], 'r')
-                plt.text(top_left[0], top_left[1]-10, text[:20], color='red', fontsize=12)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # plt.figure(figsize=(10, 10))
+            # plt.imshow(img)
             
-            plt.title("Detected Text")
-            plt.axis('off')
-            plt.show()
+            # for detection in results:
+            #     box = detection[0]
+            #     text = detection[1]
+            #     top_left = tuple(map(int, box[0]))
+            #     bottom_right = tuple(map(int, box[2]))
+            #     plt.plot([top_left[0], bottom_right[0], bottom_right[0], top_left[0], top_left[0]],
+            #              [top_left[1], top_left[1], bottom_right[1], bottom_right[1], top_left[1]], 'r')
+            #     plt.text(top_left[0], top_left[1]-10, text[:20], color='red', fontsize=12)
+            
+            # plt.title("Detected Text")
+            # plt.axis('off')
+            # plt.show()
             
             return " ".join([d[1] for d in results])
         
