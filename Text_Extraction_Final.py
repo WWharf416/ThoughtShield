@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import whisper
-from pydub import AudioSegment
+import subprocess  # Added for FFmpeg processing
 
 class TextExtractor:
     def __init__(self):
@@ -21,8 +21,36 @@ class TextExtractor:
             self.whisper_model = whisper.load_model("base")
             self.initialized = True
     
+    def _extract_audio_from_video(self, video_path):
+        """Extract audio from video file using FFmpeg"""
+        try:
+            # Create a temporary audio file
+            temp_audio_path = os.path.splitext(video_path)[0] + "_temp.wav"
+            
+            # Use FFmpeg to extract audio
+            ffmpeg_command = [
+                'ffmpeg', 
+                '-i', video_path, 
+                '-vn',  # Disable video
+                '-acodec', 'pcm_s16le',  # Set audio codec
+                '-ar', '44100',  # Set sample rate
+                '-ac', '1',  # Set to mono
+                temp_audio_path
+            ]
+            
+            # Run FFmpeg command
+            subprocess.run(ffmpeg_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            return temp_audio_path
+        except subprocess.CalledProcessError as e:
+            print(f"FFmpeg error: {e}")
+            return None
+        except Exception as e:
+            print(f"Error extracting audio from video: {str(e)}")
+            return None
+    
     def extract_text(self, file_path):
-        """Unified function to extract text from either image or audio"""
+        """Unified function to extract text from image, audio, or video"""
         self.initialize_models()
         
         if not os.path.exists(file_path):
@@ -32,8 +60,27 @@ class TextExtractor:
         
         if ext in ['.jpg', '.jpeg', '.png']:
             return self._extract_from_image(file_path)
-        elif ext in ['.mp3', '.wav', '.m4a', '.mp4']:
+        elif ext in ['.mp3', '.wav', '.m4a']:
             return self._extract_from_audio(file_path)
+        elif ext in ['.mp4', '.avi', '.mov', '.mkv']:
+            # For video files, first extract audio
+            temp_audio_path = self._extract_audio_from_video(file_path)
+            if temp_audio_path:
+                try:
+                    # Transcribe the extracted audio
+                    audio_text = self._extract_from_audio(temp_audio_path)
+                    
+                    # Clean up temporary audio file
+                    os.remove(temp_audio_path)
+                    
+                    return audio_text
+                except Exception as e:
+                    # Clean up temporary audio file in case of error
+                    if os.path.exists(temp_audio_path):
+                        os.remove(temp_audio_path)
+                    return f"Video processing error: {str(e)}"
+            else:
+                return "Error: Could not extract audio from video"
         else:
             return "Error: Unsupported file type"
     
@@ -77,13 +124,12 @@ class TextExtractor:
         except Exception as e:
             return f"Audio processing error: {str(e)}"
 
-
-# Usage example:
+# Usage 
 if __name__ == "__main__":
     extractor = TextExtractor()
     
-    # Just call this one function with your file path
-    result = extractor.extract_text("Arthur.mp3")  # or "your_audio.mp3"
+    # Demonstrate usage with different file types
+    result = extractor.extract_text("trial.png")  
     
     print("\nExtracted Text:")
     print("=" * 50)
