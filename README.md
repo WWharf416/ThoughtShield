@@ -59,6 +59,20 @@ To evaluate the model on new texts:
 python evaluate.py
 ```
 
+## Run Full Pipeline
+
+To run the full project pipeline (including text extraction):
+```bash
+python main.py
+```
+
+## Web App
+
+To run the streamlit web app:
+```
+streamlit run app.py
+```
+
 ## Monitoring
 
 Training progress can be monitored:
